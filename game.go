@@ -94,12 +94,15 @@ type PostavaAnimation struct {
 	rectangles []image.Rectangle
 }
 
+const gravity = 0.3
+
 type Postava struct {
 	Blok
 	actionSubImages [AkcePocet]PostavaAnimation
 	actualActions   []Akce
 	animationSpeed  int
 	speed           float64
+	velocityY       float64
 }
 
 func (b *Postava) getSubImageAnimation() *PostavaAnimation {
@@ -137,7 +140,19 @@ func (b *Postava) move(blocks []drawable) {
 	}
 
 	collidesWithSolid := func(b *Postava, blocks []drawable) bool {
-		pMinX, pMinY, pMaxX, pMaxY := worldBounds(b, game_instance.animationIndex)
+		// Always use the standing animation frame for a stable collision box.
+		// Running/other animations may have different frame sizes which would cause
+		// the box to grow into the ground and block horizontal movement.
+		standingAnim := &b.actionSubImages[AkceStoji]
+		if len(standingAnim.rectangles) == 0 {
+			return false
+		}
+		sub := standingAnim.rectangles[0]
+		w := float64(sub.Dx()) * b.scale.width
+		h := float64(sub.Dy()) * b.scale.height
+		pMinX, pMinY := b.coords.x, b.coords.y
+		pMaxX, pMaxY := pMinX+w, pMinY+h
+
 		for _, d := range blocks {
 			if !d.getBlock().solid {
 				continue
@@ -150,28 +165,33 @@ func (b *Postava) move(blocks []drawable) {
 		return false
 	}
 
-	var dx, dy float64
+	var dx float64
 	for _, action := range b.actualActions {
 		switch action {
 		case AkceJdeVPravo:
 			dx += b.speed
 		case AkceJdeVLevo:
 			dx -= b.speed
-		case AkceJdeNahoru:
-			dy -= b.speed
-		case AkceJdeDolu:
-			dy += b.speed
+			// case AkceJdeNahoru:
+			// 	dy -= b.speed
+			// case AkceJdeDolu:
+			// 	dy += b.speed
 		}
 	}
 
+	b.velocityY += gravity
+
+	savedX := b.coords.x
 	b.coords.x += dx
 	if collidesWithSolid(b, blocks) {
-		b.coords.x -= dx
+		b.coords.x = savedX
 	}
 
-	b.coords.y += dy
+	savedY := b.coords.y
+	b.coords.y += b.velocityY
 	if collidesWithSolid(b, blocks) {
-		b.coords.y -= dy
+		b.coords.y = savedY
+		b.velocityY = 0
 	}
 }
 
