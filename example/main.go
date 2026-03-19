@@ -10,7 +10,7 @@ func main() {
 
 	blok := gke.PridejBlok("./obrazky/rock.png")
 	gke.NastavZvetseni(blok, 0.5)
-	gke.NastavPozici(blok, 50.0, 50.0)
+	gke.NastavPozici(blok, 100.0, 150.0)
 	gke.NastavBlokovani(blok, true)
 
 	blok_s_vyrezem := gke.PridejBlokSVyrezem("./obrazky/knight.png", gke.Vyrez{X1: 34, Y1: 5, X2: 49, Y2: 26})
