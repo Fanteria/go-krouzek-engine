@@ -172,6 +172,10 @@ func (b *Postava) move(blocks []drawable) {
 			dx += b.speed
 		case AkceJdeVLevo:
 			dx -= b.speed
+		case AkceJdeDolu:
+			if b.velocityY == 0 {
+				b.velocityY -= 5.0
+			}
 			// case AkceJdeNahoru:
 			// 	dy -= b.speed
 			// case AkceJdeDolu:
