@@ -228,16 +228,17 @@ func (g *game) Draw(screen *ebiten.Image) {
 	// rendering blocks
 	for _, block := range g.blocks {
 		b := block.getBlock()
+		sub_image := block.getSubImage(g.animationIndex)
 		options := &ebiten.DrawImageOptions{}
 		options.GeoM.Scale(b.scale.width, b.scale.height)
 		if block.isMirrored() {
-			// TODO this will rotate it around axis on in place
+			w := float64(sub_image.Dx()) * b.scale.width
 			options.GeoM.Scale(-1, 1)
+			options.GeoM.Translate(w, 0)
 		}
 		options.GeoM.Translate(b.coords.x, b.coords.y)
-		sub_image := block.getSubImage(g.animationIndex)
 		picture := ebiten.NewImageFromImage(b.image.SubImage(sub_image))
-		screen.DrawImage(ebiten.NewImageFromImage(picture), options)
+		screen.DrawImage(picture, options)
 	}
 }
 
