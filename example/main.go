@@ -26,6 +26,7 @@ func main() {
 	)
 	gke.NastavPozici(animovany_blok, 250.0, 150.0)
 	gke.NastavZvetseni(animovany_blok, 2)
+	gke.NastavBlokovani(animovany_blok, true)
 
 	hratelna_postava := gke.PrijdejHratelnouPostavu(
 		"./obrazky/knight.png",
