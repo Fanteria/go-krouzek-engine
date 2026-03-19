@@ -100,14 +100,18 @@ type Postava struct {
 	speed           float64
 }
 
-func (b Postava) getSubImageAnimation() *PostavaAnimation {
+func (b *Postava) getSubImageAnimation() *PostavaAnimation {
 	var actualAction Akce
 	if len(b.actualActions) == 0 {
 		actualAction = AkceStoji
 	} else {
 		actualAction = b.actualActions[0]
 	}
-	return &b.actionSubImages[actualAction]
+	anim := &b.actionSubImages[actualAction]
+	if len(anim.rectangles) == 0 {
+		anim = &b.actionSubImages[AkceStoji]
+	}
+	return anim
 }
 
 func (b *Postava) getSubImage(index int) image.Rectangle {
