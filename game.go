@@ -26,7 +26,8 @@ type drawable interface {
 }
 
 type movable interface {
-	move()
+	// TODO there should be interface block or something like that
+	move(blocks []drawable)
 }
 
 type Background struct {
@@ -54,6 +55,7 @@ type Blok struct {
 	image  *ebiten.Image
 	coords Coords
 	scale  Scale
+	solid  bool
 }
 
 func (b *Blok) getBlock() Blok {
@@ -124,18 +126,52 @@ func (b *Postava) isMirrored() bool {
 	return subimage.mirror
 }
 
-func (b *Postava) move() {
+func (b *Postava) move(blocks []drawable) {
+	// TODO use for better results if there is no only rectangles "github.com/solarlune/resolv"
+	worldBounds := func(d drawable, animIndex int) (minX, minY, maxX, maxY float64) {
+		b := d.getBlock()
+		sub := d.getSubImage(animIndex)
+		w := float64(sub.Dx()) * b.scale.width
+		h := float64(sub.Dy()) * b.scale.height
+		return b.coords.x, b.coords.y, b.coords.x + w, b.coords.y + h
+	}
+
+	collidesWithSolid := func(b *Postava, blocks []drawable) bool {
+		pMinX, pMinY, pMaxX, pMaxY := worldBounds(b, game_instance.animationIndex)
+		for _, d := range blocks {
+			if !d.getBlock().solid {
+				continue
+			}
+			oMinX, oMinY, oMaxX, oMaxY := worldBounds(d, game_instance.animationIndex)
+			if pMaxX > oMinX && pMinX < oMaxX && pMaxY > oMinY && pMinY < oMaxY {
+				return true
+			}
+		}
+		return false
+	}
+
+	var dx, dy float64
 	for _, action := range b.actualActions {
 		switch action {
 		case AkceJdeVPravo:
-			b.coords.x += b.speed
+			dx += b.speed
 		case AkceJdeVLevo:
-			b.coords.x -= b.speed
+			dx -= b.speed
 		case AkceJdeNahoru:
-			b.coords.y -= b.speed
+			dy -= b.speed
 		case AkceJdeDolu:
-			b.coords.y += b.speed
+			dy += b.speed
 		}
+	}
+
+	b.coords.x += dx
+	if collidesWithSolid(b, blocks) {
+		b.coords.x -= dx
+	}
+
+	b.coords.y += dy
+	if collidesWithSolid(b, blocks) {
+		b.coords.y -= dy
 	}
 }
 
@@ -144,7 +180,7 @@ type HratelnaPostava struct {
 	moveActions map[ebiten.Key]Akce
 }
 
-func (p *HratelnaPostava) move() {
+func (p *HratelnaPostava) move(blocks []drawable) {
 	var pressed_keys []ebiten.Key
 	pressed_keys = inpututil.AppendPressedKeys(pressed_keys)
 	p.Postava.actualActions = []Akce{}
@@ -154,7 +190,7 @@ func (p *HratelnaPostava) move() {
 			p.Postava.actualActions = append(p.Postava.actualActions, action)
 		}
 	}
-	p.Postava.move()
+	p.Postava.move(blocks)
 }
 
 type game struct {
@@ -178,7 +214,7 @@ var game_instance game = game{
 func (g *game) Update() error {
 	g.animationIndex += 1
 	for _, movable := range g.movables {
-		movable.move()
+		movable.move(g.blocks)
 	}
 	return nil
 }

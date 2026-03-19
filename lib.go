@@ -80,16 +80,20 @@ func PrijdejHratelnouPostavu(cesta_k_obrazku string, rychlost_animace float64, a
 	}
 	block := &HratelnaPostava{
 		Postava: Postava{
-			Blok:            *sub_block,
-			actualActions:   []Akce{AkceStoji},
-			animationSpeed:  animationSpeed,
-			speed:           1,
+			Blok:           *sub_block,
+			actualActions:  []Akce{AkceStoji},
+			animationSpeed: animationSpeed,
+			speed:          1,
 		},
 		moveActions: akce_pohybu,
 	}
 	game_instance.blocks = append(game_instance.blocks, block)
 	game_instance.movables = append(game_instance.movables, block)
 	return &block.Postava
+}
+
+func NastavPevnost(blok *Blok) {
+	blok.solid = true
 }
 
 func NastavZvetseni(blok *Blok, zvetseni float64) {
@@ -102,6 +106,10 @@ func NastavPozici(blok *Blok, x float64, y float64) {
 	blok.coords.y = y
 }
 
+func NastavBlokovani(blok *Blok, blokuje bool) {
+	blok.solid = blokuje
+}
+
 func NastavRychlostPohybu(postava *Postava, rychlost_pohybu float64) {
 	postava.speed = rychlost_pohybu
 }
@@ -112,7 +120,7 @@ func NastavAnimaci(postava *Postava, akce Akce, zrcadlove_otocena bool, animace 
 		rectangles = append(rectangles, image.Rect(rect.X1, rect.Y1, rect.X2, rect.Y2))
 	}
 	postava.actionSubImages[akce] = PostavaAnimation{
-		mirror: zrcadlove_otocena,
+		mirror:     zrcadlove_otocena,
 		rectangles: rectangles,
 	}
 }

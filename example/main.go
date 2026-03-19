@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Fanteria/go-krouzek-engine"
+	gke "github.com/Fanteria/go-krouzek-engine"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -11,6 +11,7 @@ func main() {
 	blok := gke.PridejBlok("./obrazky/rock.png")
 	gke.NastavZvetseni(blok, 0.5)
 	gke.NastavPozici(blok, 50.0, 50.0)
+	gke.NastavBlokovani(blok, true)
 
 	blok_s_vyrezem := gke.PridejBlokSVyrezem("./obrazky/knight.png", gke.Vyrez{X1: 34, Y1: 5, X2: 49, Y2: 26})
 	gke.NastavPozici(blok_s_vyrezem, 150.0, 150.0)
@@ -37,7 +38,7 @@ func main() {
 		},
 	)
 	gke.NastavPozici(&hratelna_postava.Blok, 150.0, 50.0)
-	gke.NastavZvetseni(&hratelna_postava.Blok, 3)
+	gke.NastavZvetseni(&hratelna_postava.Blok, 1.5)
 	gke.NastavRychlostPohybu(hratelna_postava, 2)
 	gke.NastavAnimaci(hratelna_postava, gke.AkceStoji, false,
 		[]gke.Vyrez{
