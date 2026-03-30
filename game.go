@@ -31,10 +31,6 @@ type movable interface {
 	move(blocks []drawable)
 }
 
-type background struct {
-	image *ebiten.Image
-}
-
 type Coords struct {
 	x float64
 	y float64
