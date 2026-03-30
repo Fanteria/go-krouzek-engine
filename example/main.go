@@ -9,6 +9,7 @@ func main() {
 	gke.NastavUrovenLogovani(gke.LogInfo)
 	gke.NastavGravitaci(0.3)
 	gke.NastavPozadi("./obrazky/pozadi.png")
+	gke.NastavRezimPozadi(gke.RezimPozadiVyplnit)
 
 	blok := gke.PridejBlok("./obrazky/rock.png")
 	gke.NastavZvetseni(blok, 0.5)
