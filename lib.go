@@ -8,6 +8,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// TODO What to do with package gke problem in LSP?
+
+func NastavUrovenLogovani(uroven LogLevel) {
+	setLogLevel(uroven)
+}
+
 // NastavPozadi nastaví obrázek pozadí hry.
 // Zadej cestu k obrázku, který chceš použít jako pozadí – například "pozadi.png".
 // Pozadí se zobrazí za všemi ostatními věcmi ve hře.
@@ -17,7 +23,7 @@ func NastavPozadi(cesta_k_obrazku string) {
 		fmt.Errorf("Error: %v", err)
 		os.Exit(1)
 	}
-	game_instance.background = &Background{image: img}
+	game_instance.background = &background{image: img}
 }
 
 // PridejBlok přidá do hry nový blok (obrázek).

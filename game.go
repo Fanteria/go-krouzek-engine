@@ -30,7 +30,7 @@ type movable interface {
 	move(blocks []drawable)
 }
 
-type Background struct {
+type background struct {
 	image *ebiten.Image
 }
 
@@ -221,7 +221,7 @@ type game struct {
 	outsideWidth   int
 	outsideHeight  int
 	animationIndex int
-	background     *Background
+	background     *background
 	blocks         []drawable
 	movables       []movable
 }
