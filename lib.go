@@ -9,8 +9,16 @@ import (
 
 // TODO What to do with package gke problem in LSP?
 
+// NastavUrovenLogovani nastaví, jak moc podrobné zprávy se budou vypisovat do terminálu.
+// Můžeš použít: LogDebug (nejvíce zpráv), LogInfo, LogWarning, LogError (pouze chyby).
 func NastavUrovenLogovani(uroven LogLevel) {
 	setLogLevel(uroven)
+}
+
+// NastavGravitaci nastaví sílu gravitace – jak rychle padají postavy dolů.
+// Větší číslo = silnější gravitace, 0 = žádná gravitace.
+func NastavGravitaci(gravitace float64) {
+	gravity = gravitace
 }
 
 // NastavPozadi nastaví obrázek pozadí hry.

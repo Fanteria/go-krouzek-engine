@@ -16,6 +16,7 @@ const (
 	AkceJdeVLevo
 	AkceJdeNahoru
 	AkceJdeDolu
+	AkceSkace
 	AkcePocet
 )
 
@@ -94,7 +95,8 @@ type PostavaAnimation struct {
 	rectangles []image.Rectangle
 }
 
-const gravity = 0.3
+// TODO default should be zero in next year
+var gravity float64 = 0.3
 
 type Postava struct {
 	Blok
@@ -166,20 +168,21 @@ func (b *Postava) move(blocks []drawable) {
 	}
 
 	var dx float64
+	var dy float64
 	for _, action := range b.actualActions {
 		switch action {
 		case AkceJdeVPravo:
 			dx += b.speed
 		case AkceJdeVLevo:
 			dx -= b.speed
+		case AkceJdeNahoru:
+			dy -= b.speed
 		case AkceJdeDolu:
+			dy += b.speed
+		case AkceSkace:
 			if b.velocityY == 0 {
 				b.velocityY -= 5.0
 			}
-			// case AkceJdeNahoru:
-			// 	dy -= b.speed
-			// case AkceJdeDolu:
-			// 	dy += b.speed
 		}
 	}
 
@@ -192,6 +195,9 @@ func (b *Postava) move(blocks []drawable) {
 	}
 
 	savedY := b.coords.y
+	if gravity == 0 {
+		b.coords.y += dy
+	}
 	b.coords.y += b.velocityY
 	if collidesWithSolid(b, blocks) {
 		b.coords.y = savedY

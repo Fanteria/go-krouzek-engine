@@ -7,6 +7,7 @@ import (
 
 func main() {
 	gke.NastavUrovenLogovani(gke.LogInfo)
+	gke.NastavGravitaci(0.3)
 	gke.NastavPozadi("./obrazky/pozadi.png")
 
 	blok := gke.PridejBlok("./obrazky/rock.png")
@@ -35,6 +36,7 @@ func main() {
 		map[ebiten.Key]gke.Akce{
 			ebiten.KeyArrowRight: gke.AkceJdeVPravo,
 			ebiten.KeyArrowLeft:  gke.AkceJdeVLevo,
+			ebiten.KeySpace:      gke.AkceSkace,
 			ebiten.KeyArrowDown:  gke.AkceJdeDolu,
 			ebiten.KeyArrowUp:    gke.AkceJdeNahoru,
 		},
