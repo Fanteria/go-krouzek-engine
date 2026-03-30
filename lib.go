@@ -30,7 +30,13 @@ func NastavPozadi(cesta_k_obrazku string) {
 		log.Error("Nepodařilo se načíst pozadí", "chyba", err)
 		os.Exit(1)
 	}
-	game_instance.background = &background{image: img}
+	game_instance.background = &background{image: img, mode: RezimPozadiPuvodni}
+}
+
+// NastavRezimPozadi nastaví, jak se obrázek pozadí přizpůsobí velikosti okna.
+// Můžeš použít: Roztahnout, Vyplnit, Prizpusobit nebo Puvodni.
+func NastavRezimPozadi(rezim RezimPozadi) {
+	game_instance.background.mode = rezim
 }
 
 // PridejBlok přidá do hry nový blok (obrázek).

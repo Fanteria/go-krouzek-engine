@@ -247,10 +247,7 @@ func (g *game) Update() error {
 
 func (g *game) Draw(screen *ebiten.Image) {
 	// rendering background
-	{
-		options := &ebiten.DrawImageOptions{}
-		screen.DrawImage(g.background.image, options)
-	}
+	g.background.draw(screen)
 	// rendering blocks
 	for _, block := range g.blocks {
 		b := block.getBlock()
