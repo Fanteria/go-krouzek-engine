@@ -126,12 +126,6 @@ func PridejHratelnouPostavu(cesta_k_obrazku string, rychlost_animace float64, ak
 	return &block.Postava
 }
 
-// NastavPevnost označí blok jako pevný – ostatní postavy se o něj zastaví a neprojdou skrz.
-// Hodí se třeba pro zem, zdi nebo plošiny.
-func NastavPevnost(blok *Blok) {
-	blok.solid = true
-}
-
 // NastavZvetseni změní velikost bloku.
 // Hodnota 1.0 znamená původní velikost, 2.0 znamená dvakrát větší, 0.5 znamená poloviční.
 func NastavZvetseni(blok *Blok, zvetseni float64) {
