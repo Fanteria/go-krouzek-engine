@@ -11,6 +11,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// loadImage loads an image from the given file path and returns it as an ebiten image.
+// Supports PNG and JPEG formats.
 func loadImage(path string) (*ebiten.Image, error) {
 	image_buffer, err := os.ReadFile(path)
 	if err != nil {
@@ -23,6 +25,8 @@ func loadImage(path string) (*ebiten.Image, error) {
 	return ebiten.NewImageFromImage(image), nil
 }
 
+// loadImageToBlock loads an image from the given file path and wraps it in a Blok
+// with default position (0, 0) and scale (1, 1).
 func loadImageToBlock(path string) (*Blok, error) {
 	img, err := loadImage(path)
 	if err != nil {
