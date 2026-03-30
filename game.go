@@ -269,5 +269,6 @@ func (g *game) Draw(screen *ebiten.Image) {
 func (g *game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	g.outsideWidth = outsideWidth
 	g.outsideHeight = outsideHeight
-	return 320, 240
+	log.Debug("Nastavení velikosti okna hry", "šířka", outsideWidth, "výška", outsideHeight)
+	return outsideWidth, outsideHeight
 }

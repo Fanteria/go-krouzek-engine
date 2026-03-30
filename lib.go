@@ -1,7 +1,6 @@
 package gke
 
 import (
-	"fmt"
 	"image"
 	"os"
 
@@ -20,7 +19,7 @@ func NastavUrovenLogovani(uroven LogLevel) {
 func NastavPozadi(cesta_k_obrazku string) {
 	img, err := loadImage(cesta_k_obrazku)
 	if err != nil {
-		fmt.Errorf("Error: %v", err)
+		log.Error("Nepodařilo se načíst pozadí", "chyba", err)
 		os.Exit(1)
 	}
 	game_instance.background = &background{image: img}
@@ -33,7 +32,7 @@ func NastavPozadi(cesta_k_obrazku string) {
 func PridejBlok(cesta_k_obrazku string) *Blok {
 	sub_block, err := loadImageToBlock(cesta_k_obrazku)
 	if err != nil {
-		fmt.Errorf("Error: %v", err)
+		log.Error("Nepodařilo se načíst obrázek bloku", "chyba", err)
 		os.Exit(1)
 	}
 	block := &StatickyBlok{
@@ -51,7 +50,7 @@ func PridejBlok(cesta_k_obrazku string) *Blok {
 func PridejBlokSVyrezem(cesta_k_obrazku string, vyrez Vyrez) *Blok {
 	sub_block, err := loadImageToBlock(cesta_k_obrazku)
 	if err != nil {
-		fmt.Errorf("Error: %v", err)
+		log.Error("Nepodařilo se načíst obrázek bloku", "chyba", err)
 		os.Exit(1)
 	}
 	block := &StatickyBlok{
@@ -74,7 +73,7 @@ func PrijdejAnimovanyBlok(cesta_k_obrazku string, rychlost_animace float64, vyre
 func PridejAnimovanyBlok(cesta_k_obrazku string, rychlost_animace float64, vyrezy ...Vyrez) *Blok {
 	sub_block, err := loadImageToBlock(cesta_k_obrazku)
 	if err != nil {
-		fmt.Errorf("Error: %v", err)
+		log.Error("Nepodařilo se načíst obrázek bloku", "chyba", err)
 		os.Exit(1)
 	}
 	var subImages []image.Rectangle
@@ -105,7 +104,7 @@ func PrijdejHratelnouPostavu(cesta_k_obrazku string, rychlost_animace float64, a
 func PridejHratelnouPostavu(cesta_k_obrazku string, rychlost_animace float64, akce_pohybu map[ebiten.Key]Akce) *Postava {
 	sub_block, err := loadImageToBlock(cesta_k_obrazku)
 	if err != nil {
-		fmt.Errorf("Error: %v", err)
+		log.Error("Nepodařilo se načíst obrázek hratelné postavy", "chyba", err)
 		os.Exit(1)
 	}
 	animationSpeed := int(1 / rychlost_animace)

@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+	gke.NastavUrovenLogovani(gke.LogInfo)
 	gke.NastavPozadi("./obrazky/pozadi.png")
 
 	blok := gke.PridejBlok("./obrazky/rock.png")
