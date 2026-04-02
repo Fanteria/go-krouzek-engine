@@ -101,6 +101,7 @@ type Postava struct {
 	animationSpeed  int
 	speed           float64
 	velocityY       float64
+	jumpPower       float64
 }
 
 func (b *Postava) getSubImageAnimation() *PostavaAnimation {
@@ -177,7 +178,7 @@ func (b *Postava) move(blocks []drawable) {
 			dy += b.speed
 		case AkceSkace:
 			if b.velocityY == 0 {
-				b.velocityY -= 5.0
+				b.velocityY -= b.jumpPower
 			}
 		}
 	}

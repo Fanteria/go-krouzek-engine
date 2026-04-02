@@ -11,11 +11,13 @@ func main() {
 	gke.NastavPozadi("./obrazky/pozadi.png")
 	gke.NastavRezimPozadi(gke.RezimPozadiVyplnit)
 
+	// Přidání statického bloku kemane
 	blok := gke.PridejBlok("./obrazky/rock.png")
-	gke.NastavZvetseni(blok, 0.5)
-	gke.NastavPozici(blok, 100.0, 150.0)
+	gke.NastavZvetseni(blok, 0.15)
+	gke.NastavPozici(blok, 100.0, 377.0)
 	gke.NastavBlokovani(blok, true)
 
+	// Přidání bloků podlahy
 	blok_cislo_n := 0.0
 	for blok_cislo_n <= 20 {
 		blok1 := gke.PridejBlokSVyrezem("./obrazky/bloky.png", gke.Vyrez{X1: 0, Y1: 0, X2: 32, Y2: 32})
@@ -24,9 +26,7 @@ func main() {
 		blok_cislo_n += 1
 	}
 
-	blok_s_vyrezem := gke.PridejBlokSVyrezem("./obrazky/knight.png", gke.Vyrez{X1: 34, Y1: 5, X2: 49, Y2: 26})
-	gke.NastavPozici(blok_s_vyrezem, 150.0, 150.0)
-
+	// Přidání animovaného bloku
 	var animace []gke.Vyrez
 	for i := 0; i < 37; i += 1 {
 		animace = append(animace, gke.Vyrez{X1: i * 64, Y1: 0, X2: (i + 1) * 64, Y2: 64})
@@ -52,8 +52,9 @@ func main() {
 		},
 	)
 	gke.NastavPozici(&hratelna_postava.Blok, 150.0, 50.0)
-	gke.NastavZvetseni(&hratelna_postava.Blok, 1.5)
+	gke.NastavZvetseni(&hratelna_postava.Blok, 3)
 	gke.NastavRychlostPohybu(hratelna_postava, 2)
+	gke.NastavSiluSkoku(hratelna_postava, 7)
 	gke.NastavAnimaci(hratelna_postava, gke.AkceStoji, false,
 		[]gke.Vyrez{
 			{X1: 34, Y1: 5, X2: 49, Y2: 24},

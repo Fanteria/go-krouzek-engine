@@ -130,7 +130,9 @@ func PridejHratelnouPostavu(cesta_k_obrazku string, rychlost_animace float64, ak
 			Blok:           *sub_block,
 			actualActions:  []Akce{AkceStoji},
 			animationSpeed: animationSpeed,
-			speed:          1,
+			speed:          1.0,
+			velocityY:      0.0,
+			jumpPower:      5.0,
 		},
 		moveActions: akce_pohybu,
 	}
@@ -163,6 +165,12 @@ func NastavBlokovani(blok *Blok, blokuje bool) {
 // Výchozí rychlost je 1.0. Větší číslo = rychlejší pohyb, menší číslo = pomalejší pohyb.
 func NastavRychlostPohybu(postava *Postava, rychlost_pohybu float64) {
 	postava.speed = rychlost_pohybu
+}
+
+// NastavSiluSkoku nastaví, jak vysoko postava skáče.
+// Větší číslo znamená vyšší skok.
+func NastavSiluSkoku(postava *Postava, sila_skoku float64) {
+	postava.jumpPower = sila_skoku
 }
 
 // NastavAnimaci přiřadí postavě animaci pro určitou akci (např. běh, stání, skok).
