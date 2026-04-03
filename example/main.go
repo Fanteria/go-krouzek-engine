@@ -84,7 +84,7 @@ func main() {
 		},
 	)
 
-	enemy := gke.PridejNepritele(
+	nepritel := gke.PridejNepritele(
 		"./obrazky/knight.png",
 		func() func(*gke.Enemy) []gke.Akce {
 			var direction gke.Akce = gke.AkceJdeVPravo
@@ -99,11 +99,11 @@ func main() {
 			}
 		}(),
 	)
-	gke.NastavPozici(&enemy.Blok, 450.0, 375.0)
-	gke.NastavZvetseni(&enemy.Blok, 1)
+	gke.NastavPozici(&nepritel.Blok, 450.0, 375.0)
+	gke.NastavZvetseni(&nepritel.Blok, 1)
 
-	gke.NastavBlokovani(&enemy.Blok, true)
-	gke.NastavAnimaci(enemy, gke.AkceJdeVPravo, false,
+	gke.NastavBlokovani(&nepritel.Blok, true)
+	gke.NastavAnimaci(nepritel, gke.AkceJdeVPravo, false,
 		[]gke.Vyrez{
 			{X1: 34, Y1: 25, X2: 49, Y2: 46},
 			{X1: 50, Y1: 25, X2: 65, Y2: 46},
@@ -113,7 +113,7 @@ func main() {
 			{X1: 114, Y1: 25, X2: 129, Y2: 46},
 		},
 	)
-	gke.NastavAnimaci(enemy, gke.AkceJdeVLevo, true,
+	gke.NastavAnimaci(nepritel, gke.AkceJdeVLevo, true,
 		[]gke.Vyrez{
 			{X1: 34, Y1: 25, X2: 49, Y2: 46},
 			{X1: 50, Y1: 25, X2: 65, Y2: 46},
