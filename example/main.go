@@ -103,16 +103,7 @@ func main() {
 	gke.NastavZvetseni(&enemy.Blok, 1)
 
 	// TODO Why this block stop enemy from moving?
-	// gke.NastavBlokovani(&enemy.Blok, true)
-	// TODO Why if I remove stay action enemy drop?
-	gke.NastavAnimaci(enemy, gke.AkceStoji, false,
-		[]gke.Vyrez{
-			{X1: 34, Y1: 5, X2: 49, Y2: 24},
-			{X1: 50, Y1: 5, X2: 65, Y2: 24},
-			{X1: 66, Y1: 5, X2: 81, Y2: 24},
-			{X1: 82, Y1: 5, X2: 97, Y2: 24},
-		},
-	)
+	gke.NastavBlokovani(&enemy.Blok, true)
 	gke.NastavAnimaci(enemy, gke.AkceJdeVPravo, false,
 		[]gke.Vyrez{
 			{X1: 34, Y1: 25, X2: 49, Y2: 46},

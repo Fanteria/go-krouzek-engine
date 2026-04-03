@@ -142,13 +142,18 @@ func (b *Postava) move(blocks []drawable) {
 		// Always use the standing animation frame for a stable collision box.
 		// Running/other animations may have different frame sizes which would cause
 		// the box to grow into the ground and block horizontal movement.
+		// Fall back to the full image bounds if no standing animation is set.
+		var w, h float64
 		standingAnim := &b.actionSubImages[AkceStoji]
-		if len(standingAnim.rectangles) == 0 {
-			return false
+		if len(standingAnim.rectangles) > 0 {
+			sub := standingAnim.rectangles[0]
+			w = float64(sub.Dx()) * b.scale.width
+			h = float64(sub.Dy()) * b.scale.height
+		} else {
+			bounds := b.image.Bounds()
+			w = float64(bounds.Dx()) * b.scale.width
+			h = float64(bounds.Dy()) * b.scale.height
 		}
-		sub := standingAnim.rectangles[0]
-		w := float64(sub.Dx()) * b.scale.width
-		h := float64(sub.Dy()) * b.scale.height
 		pMinX, pMinY := b.coords.x, b.coords.y
 		pMaxX, pMaxY := pMinX+w, pMinY+h
 
