@@ -99,7 +99,7 @@ func main() {
 			}
 		}(),
 	)
-	gke.NastavPozici(&enemy.Blok, 450.0, 380.0)
+	gke.NastavPozici(&enemy.Blok, 450.0, 375.0)
 	gke.NastavZvetseni(&enemy.Blok, 1)
 
 	// TODO Why this block stop enemy from moving?

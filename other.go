@@ -91,6 +91,20 @@ type PostavaAnimation struct {
 	rectangles []image.Rectangle
 }
 
+// firstAnimationFrame returns the first rectangle from the standing animation,
+// or the first rectangle from any other action if standing is not set.
+func firstAnimationFrame(b *Postava) (image.Rectangle, bool) {
+	if len(b.actionSubImages[AkceStoji].rectangles) > 0 {
+		return b.actionSubImages[AkceStoji].rectangles[0], true
+	}
+	for _, anim := range b.actionSubImages {
+		if len(anim.rectangles) > 0 {
+			return anim.rectangles[0], true
+		}
+	}
+	return image.Rectangle{}, false
+}
+
 // TODO default should be zero in next year
 var gravity float64 = 0.3
 
@@ -120,6 +134,12 @@ func (b *Postava) getSubImageAnimation() *PostavaAnimation {
 
 func (b *Postava) getSubImage(index int) image.Rectangle {
 	subimage := b.getSubImageAnimation()
+	if len(subimage.rectangles) == 0 {
+		if sub, found := firstAnimationFrame(b); found {
+			return sub
+		}
+		return b.image.Bounds()
+	}
 	return subimage.rectangles[(index/b.animationSpeed)%len(subimage.rectangles)]
 }
 
@@ -128,7 +148,7 @@ func (b *Postava) isMirrored() bool {
 	return subimage.mirror
 }
 
-func (b *Postava) move(blocks []drawable) {
+func (b *Postava) move(self drawable, blocks []drawable) {
 	// TODO use for better results if there is no only rectangles "github.com/solarlune/resolv"
 	worldBounds := func(d drawable, animIndex int) (minX, minY, maxX, maxY float64) {
 		b := d.getBlock()
@@ -144,9 +164,8 @@ func (b *Postava) move(blocks []drawable) {
 		// the box to grow into the ground and block horizontal movement.
 		// Fall back to the full image bounds if no standing animation is set.
 		var w, h float64
-		standingAnim := &b.actionSubImages[AkceStoji]
-		if len(standingAnim.rectangles) > 0 {
-			sub := standingAnim.rectangles[0]
+		sub, found := firstAnimationFrame(b)
+		if found {
 			w = float64(sub.Dx()) * b.scale.width
 			h = float64(sub.Dy()) * b.scale.height
 		} else {
@@ -158,6 +177,9 @@ func (b *Postava) move(blocks []drawable) {
 		pMaxX, pMaxY := pMinX+w, pMinY+h
 
 		for _, d := range blocks {
+			if d == self {
+				continue
+			}
 			if !d.getBlock().solid {
 				continue
 			}
@@ -222,7 +244,7 @@ func (p *HratelnaPostava) move(blocks []drawable) {
 			p.Postava.actualActions = append(p.Postava.actualActions, action)
 		}
 	}
-	p.Postava.move(blocks)
+	p.Postava.move(p, blocks)
 }
 
 type Enemy struct {
@@ -235,5 +257,5 @@ func (e *Enemy) move(blocks []drawable) {
 	if len(e.Postava.actualActions) == 0 {
 		e.Postava.actualActions = []Akce{AkceStoji}
 	}
-	e.Postava.move(blocks)
+	e.Postava.move(e, blocks)
 }
