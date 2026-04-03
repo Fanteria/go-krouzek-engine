@@ -187,6 +187,36 @@ func NastavAnimaci(postava *Postava, akce Akce, zrcadlove_otocena bool, animace 
 	}
 }
 
+// NastavKameru zapne sledování postavy kamerou – obrazovka se bude posouvat spolu s postavou.
+// NastavKameru zapne sledování postavy kamerou – obrazovka se bude posouvat spolu s postavou.
+// Kamera se nezasune doleva za souřadnici 0.
+// Jak daleko od okrajů se kamera začne pohybovat nastavíš pomocí NastavOkrajeKamery.
+func NastavKameru(postava *Postava) {
+	game_instance.camera.postava = postava
+	game_instance.camera.active = true
+}
+
+// NastavOkrajeKamery nastaví, jak daleko od okrajů obrazovky musí postava být,
+// aby se kamera začala posouvat. Například hodnoty 200 a 200 a 150 a 150 znamenají,
+// že postava se může pohybovat v prostřední části obrazovky a kamera se pohne teprve
+// když dojde blíž k některému okraji.
+func NastavOkrajeKamery(vlevo, vpravo, nahoru, dolu float64) {
+	game_instance.camera.marginLeft = vlevo
+	game_instance.camera.marginRight = vpravo
+	game_instance.camera.marginUp = nahoru
+	game_instance.camera.marginDown = dolu
+}
+
+// ZapniKameru zapne posouvání obrazovky za postavou.
+func ZapniKameru() {
+	game_instance.camera.active = true
+}
+
+// VypniKameru vypne posouvání obrazovky – kamera zůstane na místě.
+func VypniKameru() {
+	game_instance.camera.active = false
+}
+
 // SpustHru spustí hru! Tuhle funkci zavolej jako poslední, až budeš mít vše připraveno.
 // Po jejím zavolání se otevře okno hry a hra začne běžet.
 func SpustHru() {

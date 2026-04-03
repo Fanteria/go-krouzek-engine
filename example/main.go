@@ -51,9 +51,9 @@ func main() {
 			ebiten.KeyArrowUp:    gke.AkceJdeNahoru,
 		},
 	)
-	gke.NastavPozici(&hratelna_postava.Blok, 150.0, 50.0)
+	gke.NastavPozici(&hratelna_postava.Blok, 150.0, 340.0)
 	gke.NastavZvetseni(&hratelna_postava.Blok, 3)
-	gke.NastavRychlostPohybu(hratelna_postava, 2)
+	gke.NastavRychlostPohybu(hratelna_postava, 3)
 	gke.NastavSiluSkoku(hratelna_postava, 7)
 	gke.NastavAnimaci(hratelna_postava, gke.AkceStoji, false,
 		[]gke.Vyrez{
@@ -83,6 +83,9 @@ func main() {
 			{X1: 114, Y1: 25, X2: 129, Y2: 46},
 		},
 	)
+
+	gke.NastavKameru(hratelna_postava)
+	gke.NastavOkrajeKamery(100, 100, 100, 20)
 
 	gke.SpustHru()
 }

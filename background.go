@@ -22,7 +22,8 @@ type background struct {
 }
 
 // draw renders the background onto the screen using the configured RezimPozadi.
-func (bg *background) draw(screen *ebiten.Image) {
+// offsetX and offsetY are applied only in RezimPozadiPuvodni (camera scrolling).
+func (bg *background) draw(screen *ebiten.Image, offsetX, offsetY float64) {
 	sw := float64(screen.Bounds().Dx())
 	sh := float64(screen.Bounds().Dy())
 	iw := float64(bg.image.Bounds().Dx())
@@ -42,7 +43,7 @@ func (bg *background) draw(screen *ebiten.Image) {
 		opts.GeoM.Scale(scale, scale)
 		opts.GeoM.Translate((sw-iw*scale)/2, (sh-ih*scale)/2)
 	case RezimPozadiPuvodni:
-		// no scaling
+		opts.GeoM.Translate(-offsetX, -offsetY)
 	}
 
 	screen.DrawImage(bg.image, opts)

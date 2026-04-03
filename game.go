@@ -227,6 +227,7 @@ type game struct {
 	background     *background
 	blocks         []drawable
 	movables       []movable
+	camera         camera
 }
 
 // Global instance of the game
@@ -243,12 +244,13 @@ func (g *game) Update() error {
 	for _, movable := range g.movables {
 		movable.move(g.blocks)
 	}
+	g.camera.aktualizuj(g.outsideWidth, g.outsideHeight)
 	return nil
 }
 
 func (g *game) Draw(screen *ebiten.Image) {
 	// rendering background
-	g.background.draw(screen)
+	g.background.draw(screen, g.camera.offsetX, g.camera.offsetY)
 	// rendering blocks
 	for _, block := range g.blocks {
 		b := block.getBlock()
@@ -260,7 +262,7 @@ func (g *game) Draw(screen *ebiten.Image) {
 			options.GeoM.Scale(-1, 1)
 			options.GeoM.Translate(w, 0)
 		}
-		options.GeoM.Translate(b.coords.x, b.coords.y)
+		options.GeoM.Translate(b.coords.x-g.camera.offsetX, b.coords.y-g.camera.offsetY)
 		picture := ebiten.NewImageFromImage(b.image.SubImage(sub_image))
 		screen.DrawImage(picture, options)
 	}
