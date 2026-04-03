@@ -2,7 +2,7 @@ package gke
 
 type camera struct {
 	active      bool
-	postava     *Postava
+	character   *Postava
 	offsetX     float64
 	offsetY     float64
 	marginLeft  float64
@@ -11,18 +11,18 @@ type camera struct {
 	marginDown  float64
 }
 
-func (k *camera) aktualizuj(screenW, screenH int) {
-	if !k.active || k.postava == nil {
+func (k *camera) actualize(screenW, screenH int) {
+	if !k.active || k.character == nil {
 		k.offsetX = 0
 		k.offsetY = 0
 		return
 	}
-	p := k.postava
+	p := k.character
 	sub := p.getSubImage(game_instance.animationIndex)
 	charW := float64(sub.Dx()) * p.scale.width
 	charH := float64(sub.Dy()) * p.scale.height
 
-	// X: posun kamery jen když postava přejde za okraje
+	// X: move camera only when character crosses the margins
 	charScreenX := p.coords.x - k.offsetX
 	if charScreenX < k.marginLeft {
 		k.offsetX = p.coords.x - k.marginLeft
@@ -33,7 +33,7 @@ func (k *camera) aktualizuj(screenW, screenH int) {
 		k.offsetX = 0
 	}
 
-	// Y: posun kamery jen když postava přejde za okraje
+	// Y: move camera only when character crosses the margins
 	charScreenY := p.coords.y - k.offsetY
 	if charScreenY < k.marginUp {
 		k.offsetY = p.coords.y - k.marginUp

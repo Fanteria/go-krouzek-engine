@@ -84,6 +84,56 @@ func main() {
 		},
 	)
 
+	enemy := gke.PridejNepritele(
+		"./obrazky/knight.png",
+		func() func(*gke.Enemy) []gke.Akce {
+			var direction gke.Akce = gke.AkceJdeVPravo
+			return func(enemy *gke.Enemy) []gke.Akce {
+				x := gke.ZjistitPoziciX(&enemy.Blok)
+				if x >= 550 {
+					direction = gke.AkceJdeVLevo
+				} else if x <= 350 {
+					direction = gke.AkceJdeVPravo
+				}
+				return []gke.Akce{direction}
+			}
+		}(),
+	)
+	gke.NastavPozici(&enemy.Blok, 450.0, 380.0)
+	gke.NastavZvetseni(&enemy.Blok, 1)
+
+	// TODO Why this block stop enemy from moving?
+	// gke.NastavBlokovani(&enemy.Blok, true)
+	// TODO Why if I remove stay action enemy drop?
+	gke.NastavAnimaci(enemy, gke.AkceStoji, false,
+		[]gke.Vyrez{
+			{X1: 34, Y1: 5, X2: 49, Y2: 24},
+			{X1: 50, Y1: 5, X2: 65, Y2: 24},
+			{X1: 66, Y1: 5, X2: 81, Y2: 24},
+			{X1: 82, Y1: 5, X2: 97, Y2: 24},
+		},
+	)
+	gke.NastavAnimaci(enemy, gke.AkceJdeVPravo, false,
+		[]gke.Vyrez{
+			{X1: 34, Y1: 25, X2: 49, Y2: 46},
+			{X1: 50, Y1: 25, X2: 65, Y2: 46},
+			{X1: 66, Y1: 25, X2: 81, Y2: 46},
+			{X1: 82, Y1: 25, X2: 97, Y2: 46},
+			{X1: 98, Y1: 25, X2: 113, Y2: 46},
+			{X1: 114, Y1: 25, X2: 129, Y2: 46},
+		},
+	)
+	gke.NastavAnimaci(enemy, gke.AkceJdeVLevo, true,
+		[]gke.Vyrez{
+			{X1: 34, Y1: 25, X2: 49, Y2: 46},
+			{X1: 50, Y1: 25, X2: 65, Y2: 46},
+			{X1: 66, Y1: 25, X2: 81, Y2: 46},
+			{X1: 82, Y1: 25, X2: 97, Y2: 46},
+			{X1: 98, Y1: 25, X2: 113, Y2: 46},
+			{X1: 114, Y1: 25, X2: 129, Y2: 46},
+		},
+	)
+
 	gke.NastavKameru(hratelna_postava)
 	gke.NastavOkrajeKamery(100, 100, 100, 20)
 

@@ -116,6 +116,7 @@ func PrijdejHratelnouPostavu(cesta_k_obrazku string, rychlost_animace float64, a
 // například klávesa šipka doleva způsobí, že postava půjde doleva.
 // Vrátí ukazatel na postavu, se kterou pak můžeš pracovat pomocí dalších funkcí.
 func PridejHratelnouPostavu(cesta_k_obrazku string, rychlost_animace float64, akce_pohybu map[ebiten.Key]Akce) *Postava {
+	// TODO rychlost_animace should be in separate function
 	sub_block, err := loadImageToBlock(cesta_k_obrazku)
 	if err != nil {
 		log.Error("Nepodařilo se načíst obrázek hratelné postavy", "chyba", err)
@@ -141,6 +142,30 @@ func PridejHratelnouPostavu(cesta_k_obrazku string, rychlost_animace float64, ak
 	return &block.Postava
 }
 
+func PridejNepritele(cesta_k_obrazku string, strategie_pohybu func(*Enemy) []Akce) *Postava {
+	// TODO rychlost_animace should be in separate function
+	sub_block, err := loadImageToBlock(cesta_k_obrazku)
+	if err != nil {
+		log.Error("Nepodařilo se načíst obrázek nepřítele", "chyba", err)
+		os.Exit(1)
+	}
+	block := &Enemy{
+		Postava: Postava{
+			Blok:           *sub_block,
+			actualActions:  []Akce{AkceStoji},
+			animationSpeed: 10,
+			speed:          1.0,
+			velocityY:      0.0,
+			jumpPower:      5.0,
+		},
+		movingStrategy: strategie_pohybu,
+	}
+	game_instance.blocks = append(game_instance.blocks, block)
+	game_instance.movables = append(game_instance.movables, block)
+
+	return &block.Postava
+}
+
 // NastavZvetseni změní velikost bloku.
 // Hodnota 1.0 znamená původní velikost, 2.0 znamená dvakrát větší, 0.5 znamená poloviční.
 func NastavZvetseni(blok *Blok, zvetseni float64) {
@@ -153,6 +178,16 @@ func NastavZvetseni(blok *Blok, zvetseni float64) {
 func NastavPozici(blok *Blok, x float64, y float64) {
 	blok.coords.x = x
 	blok.coords.y = y
+}
+
+// ZjistitPoziciX vrátí aktuální souřadnici X (vodorovnou polohu) bloku v pixelech.
+func ZjistitPoziciX(blok *Blok) float64 {
+	return blok.coords.x
+}
+
+// ZjistitPoziciY vrátí aktuální souřadnici Y (svislou polohu) bloku v pixelech.
+func ZjistitPoziciY(blok *Blok) float64 {
+	return blok.coords.y
 }
 
 // NastavBlokovani zapíná nebo vypíná, zda blok zastavuje postavy.
@@ -187,12 +222,20 @@ func NastavAnimaci(postava *Postava, akce Akce, zrcadlove_otocena bool, animace 
 	}
 }
 
+func NastavRychlostAnimace(postava *Postava, rychlost_animace float64) {
+	animationSpeed := int(1 / rychlost_animace)
+	if animationSpeed <= 0 {
+		log.Warn("Rychlost animace nemůže být záportná", "rychlost animace", rychlost_animace)
+		animationSpeed = 1
+	}
+}
+
 // NastavKameru zapne sledování postavy kamerou – obrazovka se bude posouvat spolu s postavou.
 // NastavKameru zapne sledování postavy kamerou – obrazovka se bude posouvat spolu s postavou.
 // Kamera se nezasune doleva za souřadnici 0.
 // Jak daleko od okrajů se kamera začne pohybovat nastavíš pomocí NastavOkrajeKamery.
 func NastavKameru(postava *Postava) {
-	game_instance.camera.postava = postava
+	game_instance.camera.character = postava
 	game_instance.camera.active = true
 }
 
