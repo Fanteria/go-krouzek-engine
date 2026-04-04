@@ -89,10 +89,10 @@ func main() {
 	zdravi := 100
 	nepritel := gke.PridejNepritele(
 		"./obrazky/knight.png",
-		func() func(*gke.Enemy) []gke.Akce {
+		func() func(*gke.Postava) []gke.Akce {
 			var direction gke.Akce = gke.AkceJdeVPravo
-			return func(enemy *gke.Enemy) []gke.Akce {
-				if gke.ZjistitKontakt(&enemy.Postava, hratelna_postava) {
+			return func(enemy *gke.Postava) []gke.Akce {
+				if gke.ZjistiKontaktSHratelnouPostavou(enemy) {
 					zdravi -= 1
 					fmt.Println("Zdraví hráče:", zdravi)
 				}

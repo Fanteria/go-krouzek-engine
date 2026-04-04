@@ -142,14 +142,14 @@ func PridejHratelnouPostavu(cesta_k_obrazku string, rychlost_animace float64, ak
 	return &block.Postava
 }
 
-func PridejNepritele(cesta_k_obrazku string, strategie_pohybu func(*Enemy) []Akce) *Postava {
+func PridejNepritele(cesta_k_obrazku string, strategie_pohybu func(*Postava) []Akce) *Postava {
 	// TODO rychlost_animace should be in separate function
 	sub_block, err := loadImageToBlock(cesta_k_obrazku)
 	if err != nil {
 		log.Error("Nepodařilo se načíst obrázek nepřítele", "chyba", err)
 		os.Exit(1)
 	}
-	block := &Enemy{
+	block := &enemy{
 		Postava: Postava{
 			Blok:           *sub_block,
 			actualActions:  []Akce{AkceStoji},
@@ -198,6 +198,10 @@ func ZjistitKontakt(a *Postava, b *Postava) bool {
 	aMinX, aMinY, aMaxX, aMaxY := bounds(a)
 	bMinX, bMinY, bMaxX, bMaxY := bounds(b)
 	return aMaxX > bMinX && aMinX < bMaxX && aMaxY > bMinY && aMinY < bMaxY
+}
+
+func ZjistiKontaktSHratelnouPostavou(postava *Postava) bool {
+	return ZjistitKontakt(game_instance.camera.character, postava)
 }
 
 // ZjistitPoziciX vrátí aktuální souřadnici X (vodorovnou polohu) bloku v pixelech.

@@ -247,13 +247,13 @@ func (p *HratelnaPostava) move(blocks []drawable) {
 	p.Postava.move(p, blocks)
 }
 
-type Enemy struct {
+type enemy struct {
 	Postava
-	movingStrategy func(enemy *Enemy) []Akce
+	movingStrategy func(enemy *Postava) []Akce
 }
 
-func (e *Enemy) move(blocks []drawable) {
-	e.Postava.actualActions = e.movingStrategy(e)
+func (e *enemy) move(blocks []drawable) {
+	e.Postava.actualActions = e.movingStrategy(&e.Postava)
 	if len(e.Postava.actualActions) == 0 {
 		e.Postava.actualActions = []Akce{AkceStoji}
 	}
