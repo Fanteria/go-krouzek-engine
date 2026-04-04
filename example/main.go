@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	gke "github.com/Fanteria/go-krouzek-engine"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -84,11 +86,16 @@ func main() {
 		},
 	)
 
+	zdravi := 100
 	nepritel := gke.PridejNepritele(
 		"./obrazky/knight.png",
 		func() func(*gke.Enemy) []gke.Akce {
 			var direction gke.Akce = gke.AkceJdeVPravo
 			return func(enemy *gke.Enemy) []gke.Akce {
+				if gke.ZjistitKontakt(&enemy.Postava, hratelna_postava) {
+					zdravi -= 1
+					fmt.Println("Zdraví hráče:", zdravi)
+				}
 				x := gke.ZjistitPoziciX(&enemy.Blok)
 				if x >= 550 {
 					direction = gke.AkceJdeVLevo
@@ -102,7 +109,7 @@ func main() {
 	gke.NastavPozici(&nepritel.Blok, 450.0, 375.0)
 	gke.NastavZvetseni(&nepritel.Blok, 1)
 
-	gke.NastavBlokovani(&nepritel.Blok, true)
+	gke.NastavBlokovani(&nepritel.Blok, false)
 	gke.NastavAnimaci(nepritel, gke.AkceJdeVPravo, false,
 		[]gke.Vyrez{
 			{X1: 34, Y1: 25, X2: 49, Y2: 46},

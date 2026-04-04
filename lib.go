@@ -180,6 +180,26 @@ func NastavPozici(blok *Blok, x float64, y float64) {
 	blok.coords.y = y
 }
 
+// ZjistitKontakt zjistí, zda se dvě postavy navzájem dotýkají (překrývají).
+// Vrátí true, pokud se postavy překrývají, jinak false.
+func ZjistitKontakt(a *Postava, b *Postava) bool {
+	bounds := func(p *Postava) (minX, minY, maxX, maxY float64) {
+		sub, found := firstAnimationFrame(p)
+		var w, h float64
+		if found {
+			w = float64(sub.Dx()) * p.scale.width
+			h = float64(sub.Dy()) * p.scale.height
+		} else {
+			w = float64(p.image.Bounds().Dx()) * p.scale.width
+			h = float64(p.image.Bounds().Dy()) * p.scale.height
+		}
+		return p.coords.x, p.coords.y, p.coords.x + w, p.coords.y + h
+	}
+	aMinX, aMinY, aMaxX, aMaxY := bounds(a)
+	bMinX, bMinY, bMaxX, bMaxY := bounds(b)
+	return aMaxX > bMinX && aMinX < bMaxX && aMaxY > bMinY && aMinY < bMaxY
+}
+
 // ZjistitPoziciX vrátí aktuální souřadnici X (vodorovnou polohu) bloku v pixelech.
 func ZjistitPoziciX(blok *Blok) float64 {
 	return blok.coords.x
