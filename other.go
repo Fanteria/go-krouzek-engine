@@ -245,6 +245,7 @@ func (p *HratelnaPostava) move(blocks []drawable) {
 		}
 	}
 	p.Postava.move(p, blocks)
+	log.Info("Aktuální souřadnice postavy", "x", p.Postava.coords.x, "y", p.Postava.coords.y)
 }
 
 type enemy struct {
