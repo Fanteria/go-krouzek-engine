@@ -21,6 +21,8 @@ func NastavSouradnicivouMrizku(rozestup float64) {
 	game_instance.gridSpacing = rozestup
 }
 
+// Nastaví složku s obrázky, která je vložená přímo do programu pomocí go:embed.
+// Zavolej tuto funkci na začátku programu, pokud chceš obrázky zabalit do spustitelného souboru.
 func NastavSlozkuSObrazky(slozka *embed.FS) {
 	assets = slozka
 }
