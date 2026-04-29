@@ -24,8 +24,8 @@ func main() {
     gke.NastavBlokovani(zem, true)
 
     postava := gke.PridejHratelnouPostavu("hrdina.png", 0.1, map[ebiten.Key]gke.Akce{
-        ebiten.KeyArrowLeft:  gke.AkceJdeVlevo,
-        ebiten.KeyArrowRight: gke.AkceJdePravo,
+        ebiten.KeyArrowLeft:  gke.AkceJdeVLevo,
+        ebiten.KeyArrowRight: gke.AkceJdeVPravo,
     })
 
     gke.SpustHru() // tohle volej vždy jako poslední!
@@ -111,8 +111,8 @@ a mapu kláves – každé klávese přiřadíš akci, která se má stát po je
 
 ```go
 postava := gke.PridejHratelnouPostavu("hrdina.png", 0.1, map[ebiten.Key]gke.Akce{
-    ebiten.KeyArrowLeft:  gke.AkceJdeVlevo,
-    ebiten.KeyArrowRight: gke.AkceJdePravo,
+    ebiten.KeyArrowLeft:  gke.AkceJdeVLevo,
+    ebiten.KeyArrowRight: gke.AkceJdeVPravo,
     ebiten.KeySpace:      gke.AkceSkace,
 })
 ```
@@ -131,15 +131,33 @@ kdy použiješ stejné snímky jako pro pohyb doprava, jen otočené.
 
 ```go
 // Animace běhu doprava
-gke.NastavAnimaci(postava, gke.AkceJdePravo, false, []gke.Vyrez{
+gke.NastavAnimaci(postava, gke.AkceJdeVPravo, false, []gke.Vyrez{
     {X1: 0,  Y1: 0, X2: 32, Y2: 32},
     {X1: 32, Y1: 0, X2: 64, Y2: 32},
 })
 
 // Animace běhu doleva – stejné snímky, jen zrcadlově otočené
-gke.NastavAnimaci(postava, gke.AkceJdeVlevo, true, []gke.Vyrez{
+gke.NastavAnimaci(postava, gke.AkceJdeVLevo, true, []gke.Vyrez{
     {X1: 0,  Y1: 0, X2: 32, Y2: 32},
     {X1: 32, Y1: 0, X2: 64, Y2: 32},
+})
+
+// Animace skoku (bez směru)
+gke.NastavAnimaci(postava, gke.AkceSkace, false, []gke.Vyrez{
+    {X1: 0,  Y1: 32, X2: 32, Y2: 64},
+    {X1: 32, Y1: 32, X2: 64, Y2: 64},
+})
+
+// Animace skoku doprava
+gke.NastavAnimaci(postava, gke.AkceSkaceVPravo, false, []gke.Vyrez{
+    {X1: 0,  Y1: 32, X2: 32, Y2: 64},
+    {X1: 32, Y1: 32, X2: 64, Y2: 64},
+})
+
+// Animace skoku doleva – zrcadlově otočená
+gke.NastavAnimaci(postava, gke.AkceSkaceVLevo, true, []gke.Vyrez{
+    {X1: 0,  Y1: 32, X2: 32, Y2: 64},
+    {X1: 32, Y1: 32, X2: 64, Y2: 64},
 })
 ```
 

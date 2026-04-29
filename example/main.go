@@ -85,6 +85,30 @@ func main() {
 			{X1: 114, Y1: 25, X2: 129, Y2: 46},
 		},
 	)
+	gke.NastavAnimaci(hratelna_postava, gke.AkceSkace, false,
+		[]gke.Vyrez{
+			{X1: 34, Y1: 47, X2: 49, Y2: 68},
+			{X1: 50, Y1: 47, X2: 65, Y2: 68},
+			{X1: 66, Y1: 47, X2: 81, Y2: 68},
+			{X1: 82, Y1: 47, X2: 97, Y2: 68},
+		},
+	)
+	gke.NastavAnimaci(hratelna_postava, gke.AkceSkaceVPravo, false,
+		[]gke.Vyrez{
+			{X1: 34, Y1: 47, X2: 49, Y2: 68},
+			{X1: 50, Y1: 47, X2: 65, Y2: 68},
+			{X1: 66, Y1: 47, X2: 81, Y2: 68},
+			{X1: 82, Y1: 47, X2: 97, Y2: 68},
+		},
+	)
+	gke.NastavAnimaci(hratelna_postava, gke.AkceSkaceVLevo, true,
+		[]gke.Vyrez{
+			{X1: 34, Y1: 47, X2: 49, Y2: 68},
+			{X1: 50, Y1: 47, X2: 65, Y2: 68},
+			{X1: 66, Y1: 47, X2: 81, Y2: 68},
+			{X1: 82, Y1: 47, X2: 97, Y2: 68},
+		},
+	)
 
 	zdravi := 100
 	nepritel := gke.PridejNepritele(

@@ -2,6 +2,7 @@ package gke
 
 import (
 	"image"
+	"slices"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -17,7 +18,9 @@ const (
 	AkceJdeNahoru
 	AkceJdeDolu
 	AkceSkace
-	AkcePocet
+	AkceSkaceVPravo
+	AkceSkaceVLevo
+	akcePocet
 )
 
 type drawable interface {
@@ -110,26 +113,76 @@ var gravity float64 = 0.3
 
 type Postava struct {
 	Blok
-	actionSubImages [AkcePocet]PostavaAnimation
+	actionSubImages [akcePocet]PostavaAnimation
 	actualActions   []Akce
 	animationSpeed  int
 	speed           float64
 	velocityY       float64
 	jumpPower       float64
+	onGround        bool
 }
 
 func (b *Postava) getSubImageAnimation() *PostavaAnimation {
-	var actualAction Akce
-	if len(b.actualActions) == 0 {
-		actualAction = AkceStoji
-	} else {
-		actualAction = b.actualActions[0]
+	actions := b.actualActions
+	if !b.onGround {
+		actions = append(actions, AkceSkace)
 	}
-	anim := &b.actionSubImages[actualAction]
-	if len(anim.rectangles) == 0 {
-		anim = &b.actionSubImages[AkceStoji]
+
+	// Cancel opposing direction pairs.
+	opposing := [][2]Akce{
+		{AkceJdeVLevo, AkceJdeVPravo},
+		{AkceJdeNahoru, AkceJdeDolu},
 	}
-	return anim
+	for _, pair := range opposing {
+		if slices.Contains(actions, pair[0]) && slices.Contains(actions, pair[1]) {
+			actions = slices.DeleteFunc(actions, func(a Akce) bool {
+				return a == pair[0] || a == pair[1]
+			})
+		}
+	}
+
+	// Sort and deduplicate actions
+	slices.Sort(actions)
+	actions = slices.Compact(actions)
+
+	get_action := func(actions ...Akce) *PostavaAnimation {
+		for _, action := range actions {
+			animation := &b.actionSubImages[action]
+			if len(animation.rectangles) != 0 {
+				return animation
+			}
+		}
+		if len(b.actionSubImages[AkceStoji].rectangles) != 0 {
+			return &b.actionSubImages[AkceStoji]
+		}
+		for _, animation_images := range b.actionSubImages {
+			if len(animation_images.rectangles) != 0 {
+				return &animation_images
+			}
+		}
+		log.Error("Není zadáná ani jedna animace postavy")
+		return nil
+	}
+
+	switch {
+	case len(actions) == 0:
+		return get_action()
+	case len(actions) == 1:
+		return get_action(actions[0])
+	case slices.Equal(actions, []Akce{AkceJdeVLevo, AkceSkace}):
+		return get_action(AkceSkaceVLevo, AkceSkace, AkceJdeVLevo)
+	case slices.Equal(actions, []Akce{AkceJdeVPravo, AkceSkace}):
+		return get_action(AkceSkaceVPravo, AkceSkace, AkceJdeVPravo)
+	case slices.Equal(actions, []Akce{AkceSkaceVLevo, AkceSkaceVPravo}):
+		return get_action(AkceSkace)
+	case slices.Equal(actions, []Akce{AkceJdeVLevo, AkceSkaceVPravo}):
+		return get_action(AkceSkace)
+	case slices.Equal(actions, []Akce{AkceJdeVPravo, AkceSkaceVLevo}):
+		return get_action(AkceSkace)
+	default:
+		slices.Reverse(actions)
+		return get_action(actions...)
+	}
 }
 
 func (b *Postava) getSubImage(index int) image.Rectangle {
@@ -204,12 +257,21 @@ func (b *Postava) move(self drawable, blocks []drawable) {
 		case AkceJdeDolu:
 			dy += b.speed
 		case AkceSkace:
-			if b.velocityY == 0 {
+			if b.onGround == true {
+				b.velocityY -= b.jumpPower
+			}
+		case AkceSkaceVLevo:
+			if b.onGround == true {
+				b.velocityY -= b.jumpPower
+			}
+		case AkceSkaceVPravo:
+			if b.onGround == true {
 				b.velocityY -= b.jumpPower
 			}
 		}
 	}
 
+	b.onGround = false
 	b.velocityY += gravity
 
 	savedX := b.coords.x
@@ -226,6 +288,7 @@ func (b *Postava) move(self drawable, blocks []drawable) {
 	if collidesWithSolid(b, blocks) {
 		b.coords.y = savedY
 		b.velocityY = 0
+		b.onGround = true
 	}
 }
 

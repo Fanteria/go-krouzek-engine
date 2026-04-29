@@ -1,7 +1,10 @@
 package gke
 
 import (
+	"image/color"
+
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type game struct {
@@ -34,6 +37,16 @@ func (g *game) Update() error {
 }
 
 func (g *game) Draw(screen *ebiten.Image) {
+	var spacing float32 = 100.0
+	w, h := screen.Size()
+	for x := float32(0); x < float32(w); x += spacing {
+		vector.StrokeLine(screen, x, 0, x, float32(h), 1, color.Gray{Y: 100}, false)
+	}
+
+	for y := float32(0); y < float32(h); y += spacing {
+		vector.StrokeLine(screen, 0, y, float32(w), y, 1, color.Gray{Y: 100}, false)
+	}
+
 	// rendering background
 	g.background.draw(screen, g.camera.offsetX, g.camera.offsetY)
 	// rendering blocks
