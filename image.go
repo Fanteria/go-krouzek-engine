@@ -2,8 +2,10 @@ package gke
 
 import (
 	"bytes"
+	"embed"
 	"image"
 	"os"
+	"strings"
 
 	_ "image/jpeg"
 	_ "image/png"
@@ -13,6 +15,7 @@ import (
 
 // Loaded images are in map so loadImage can be used multiple time without large memory overhead.
 var images map[string]*ebiten.Image
+var assets *embed.FS = nil
 
 // loadImage loads an image from the given file path and returns it as an ebiten image.
 // Supports PNG and JPEG formats.
@@ -21,7 +24,13 @@ func loadImage(path string) (*ebiten.Image, error) {
 	if img != nil {
 		return img, nil
 	}
-	image_buffer, err := os.ReadFile(path)
+	var image_buffer []byte
+	var err error
+	if assets == nil {
+		image_buffer, err = os.ReadFile(path)
+	} else {
+		image_buffer, err = assets.ReadFile(strings.TrimPrefix(path, "./"))
+	}
 	if err != nil {
 		return nil, err
 	}

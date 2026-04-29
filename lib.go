@@ -1,6 +1,7 @@
 package gke
 
 import (
+	"embed"
 	"image"
 	"os"
 
@@ -13,6 +14,15 @@ import (
 // Můžeš použít: LogDebug (nejvíce zpráv), LogInfo, LogWarning, LogError (pouze chyby).
 func NastavUrovenLogovani(uroven LogLevel) {
 	setLogLevel(uroven)
+}
+
+// NastavSouradnicivouMrizku zapne zobrazení souřadnicové mřížky s daným rozestupem mezi čarami (v pixelech).
+func NastavSouradnicivouMrizku(rozestup float64) {
+	game_instance.gridSpacing = rozestup
+}
+
+func NastavSlozkuSObrazky(slozka *embed.FS) {
+	assets = slozka
 }
 
 // NastavGravitaci nastaví sílu gravitace – jak rychle padají postavy dolů.

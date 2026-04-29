@@ -1,14 +1,20 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 
 	gke "github.com/Fanteria/go-krouzek-engine"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+//go:embed all:obrazky
+var assets embed.FS
+
 func main() {
-	gke.NastavUrovenLogovani(gke.LogInfo)
+	gke.NastavSlozkuSObrazky(&assets)
+	gke.NastavUrovenLogovani(gke.LogDebug)
+	gke.NastavSouradnicivouMrizku(50)
 	gke.NastavGravitaci(0.3)
 	gke.NastavPozadi("./obrazky/pozadi.png")
 	gke.NastavRezimPozadi(gke.RezimPozadiVyplnit)
