@@ -1,10 +1,14 @@
 package gke
 
 import (
+	"fmt"
 	"image/color"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"golang.org/x/image/font/basicfont"
 )
 
 type game struct {
@@ -15,6 +19,7 @@ type game struct {
 	blocks         []drawable
 	movables       []movable
 	camera         camera
+	gridSpacing    float64
 }
 
 // Global instance of the game
@@ -24,6 +29,7 @@ var game_instance game = game{
 	animationIndex: 0,
 	background:     nil,
 	blocks:         []drawable{},
+	gridSpacing:    0,
 }
 
 func (g *game) Update() error {
@@ -37,16 +43,6 @@ func (g *game) Update() error {
 }
 
 func (g *game) Draw(screen *ebiten.Image) {
-	var spacing float32 = 100.0
-	w, h := screen.Size()
-	for x := float32(0); x < float32(w); x += spacing {
-		vector.StrokeLine(screen, x, 0, x, float32(h), 1, color.Gray{Y: 100}, false)
-	}
-
-	for y := float32(0); y < float32(h); y += spacing {
-		vector.StrokeLine(screen, 0, y, float32(w), y, 1, color.Gray{Y: 100}, false)
-	}
-
 	// rendering background
 	g.background.draw(screen, g.camera.offsetX, g.camera.offsetY)
 	// rendering blocks
@@ -63,6 +59,28 @@ func (g *game) Draw(screen *ebiten.Image) {
 		options.GeoM.Translate(b.coords.x-g.camera.offsetX, b.coords.y-g.camera.offsetY)
 		picture := ebiten.NewImageFromImage(b.image.SubImage(sub_image))
 		screen.DrawImage(picture, options)
+	}
+
+	// Draw coordinates grid
+	if g.gridSpacing > 0 {
+		startX := math.Floor(g.camera.offsetX/g.gridSpacing) * g.gridSpacing
+		startY := math.Floor(g.camera.offsetY/g.gridSpacing) * g.gridSpacing
+
+		for x := startX; x < g.camera.offsetX+float64(screen.Bounds().Dx()); x += g.gridSpacing {
+			sx := x - g.camera.offsetX
+			label := fmt.Sprintf("%.0f", x)
+
+			text.Draw(screen, label, basicfont.Face7x13, int(sx)+2, 12, color.White)
+			vector.StrokeLine(screen, float32(sx), 0, float32(sx), float32(screen.Bounds().Dy()), 1, color.Gray{Y: 100}, false)
+		}
+
+		for y := startY; y < g.camera.offsetY+float64(screen.Bounds().Dy()); y += g.gridSpacing {
+			sy := y - g.camera.offsetY
+			label := fmt.Sprintf("%.0f", y)
+
+			text.Draw(screen, label, basicfont.Face7x13, 2, int(sy)+12, color.White)
+			vector.StrokeLine(screen, 0, float32(sy), float32(screen.Bounds().Dx()), float32(sy), 1, color.Gray{Y: 100}, false)
+		}
 	}
 }
 

@@ -1,19 +1,69 @@
 package main
 
 import (
-	"embed"
 	"fmt"
 
 	gke "github.com/Fanteria/go-krouzek-engine"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-//go:embed all:obrazky
-var assets embed.FS
-
 func main() {
+	gke.NastavPozadi("./obrazky/pozadi.png")
+	gke.NastavRezimPozadi(gke.RezimPozadiVyplnit)
+
+	// Plocha po které může hratelná postava chodit.
+	for i := 0.0; i <= 40; i += 1 {
+		blok1 := gke.PridejBlokSVyrezem("./obrazky/bloky.png", gke.Vyrez{X1: 0, Y1: 0, X2: 32, Y2: 32})
+		gke.NastavPozici(blok1, i*32, 400)
+		gke.NastavBlokovani(blok1, true)
+	}
+
+	// Přidání animovaného bloku.
+	var animace []gke.Vyrez
+	for i := 0; i < 37; i += 1 {
+		animace = append(animace, gke.Vyrez{X1: i * 64, Y1: 0, X2: (i + 1) * 64, Y2: 64})
+	}
+	animovany_blok := gke.PrijdejAnimovanyBlok("./obrazky/tree_animated.png", 0.08, animace...)
+	gke.NastavPozici(animovany_blok, 250.0, 208.0)
+	gke.NastavZvetseni(animovany_blok, 3)
+
+	// Přidání hratelné postavy s různými druhy animace
+	hratelna_postava := gke.PrijdejHratelnouPostavu(
+		"./obrazky/knight.png",
+		0.1,
+		map[ebiten.Key]gke.Akce{ebiten.KeyArrowRight: gke.AkceJdeVPravo, ebiten.KeyArrowLeft: gke.AkceJdeVLevo, ebiten.KeySpace: gke.AkceSkace})
+	gke.NastavPozici(&hratelna_postava.Blok, 150.0, 340.0)
+	gke.NastavZvetseni(&hratelna_postava.Blok, 3)
+	gke.NastavRychlostPohybu(hratelna_postava, 3)
+	gke.NastavSiluSkoku(hratelna_postava, 7)
+	gke.NastavAnimaci(hratelna_postava, gke.AkceStoji, false, []gke.Vyrez{
+		{X1: 34, Y1: 5, X2: 49, Y2: 24}, {X1: 50, Y1: 5, X2: 65, Y2: 24}, {X1: 66, Y1: 5, X2: 81, Y2: 24}, {X1: 82, Y1: 5, X2: 97, Y2: 24}})
+	animace_behu := []gke.Vyrez{
+		{X1: 34, Y1: 25, X2: 49, Y2: 46}, {X1: 50, Y1: 25, X2: 65, Y2: 46}, {X1: 66, Y1: 25, X2: 81, Y2: 46},
+		{X1: 82, Y1: 25, X2: 97, Y2: 46}, {X1: 98, Y1: 25, X2: 113, Y2: 46}, {X1: 114, Y1: 25, X2: 129, Y2: 46}}
+	gke.NastavAnimaci(hratelna_postava, gke.AkceJdeVPravo, false, animace_behu)
+	gke.NastavAnimaci(hratelna_postava, gke.AkceJdeVLevo, true, animace_behu)
+
+	// Přidání statického bloku kemane
+	blok1 := gke.PridejBlok("./obrazky/rock.png")
+	gke.NastavZvetseni(blok1, 0.35)
+	gke.NastavPozici(blok1, 300.0, 349.0)
+	gke.NastavBlokovani(blok1, true)
+	blok2 := gke.PridejBlok("./obrazky/rock.png")
+	gke.NastavZvetseni(blok2, 0.35)
+	gke.NastavPozici(blok2, 450.0, 277.0)
+	gke.NastavBlokovani(blok2, true)
+
+	gke.SpustHru()
+}
+
+// //go:embed all:obrazky
+// var assets embed.FS
+
+func main2() {
 	gke.NastavSlozkuSObrazky(&assets)
 	gke.NastavUrovenLogovani(gke.LogDebug)
+	// TODO fix name to NastavSouradnicovouMrizku
 	gke.NastavSouradnicivouMrizku(50)
 	gke.NastavGravitaci(0.3)
 	gke.NastavPozadi("./obrazky/pozadi.png")
@@ -46,8 +96,8 @@ func main() {
 	)
 	gke.NastavPozici(animovany_blok, 250.0, 208.0)
 	gke.NastavZvetseni(animovany_blok, 3)
-	gke.NastavBlokovani(animovany_blok, false)
 
+	// Přidání animované postavy s různými druhy animace.
 	hratelna_postava := gke.PrijdejHratelnouPostavu(
 		"./obrazky/knight.png",
 		0.1,
