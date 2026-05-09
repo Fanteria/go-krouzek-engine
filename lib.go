@@ -3,6 +3,7 @@ package gke
 import (
 	"embed"
 	"image"
+	"math"
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -87,9 +88,9 @@ func PridejBlokSVyrezem(cesta_k_obrazku string, vyrez Vyrez) *Blok {
 	return &block.Blok
 }
 
-func PrijdejAnimovanyBlok(cesta_k_obrazku string, rychlost_animace float64, vyrezy ...Vyrez) *Blok {
+func PrijdejAnimovanyBlok(cesta_k_obrazku string, vyrezy ...Vyrez) *Blok {
 	// TODO to be removed for now leave this function here to not break API at now
-	return PridejAnimovanyBlok(cesta_k_obrazku, rychlost_animace, vyrezy...)
+	return PridejAnimovanyBlok(cesta_k_obrazku, 0.1, vyrezy...)
 }
 
 // PridejAnimovanyBlok přidá do hry animovaný blok – obrázek, který se pohybuje jako animace.
@@ -97,6 +98,17 @@ func PrijdejAnimovanyBlok(cesta_k_obrazku string, rychlost_animace float64, vyre
 // a libovolný počet výřezů, které tvoří jednotlivé snímky animace.
 // Vrátí ukazatel na blok.
 func PridejAnimovanyBlok(cesta_k_obrazku string, rychlost_animace float64, vyrezy ...Vyrez) *Blok {
+	block := PridejAnimovanyBlokAnim(cesta_k_obrazku, vyrezy...)
+	NastavRychlostAnimaceProAnimovanyBlok(block, rychlost_animace)
+	return &block.Blok
+}
+
+// PridejAnimovanyBlok přidá do hry animovaný blok – obrázek, který se pohybuje jako animace.
+// Zadej cestu k obrázku (spritesheetu), rychlost animace (např. 0.1 = pomalá, 1.0 = rychlá)
+// a libovolný počet výřezů, které tvoří jednotlivé snímky animace.
+// Vrátí ukazatel na blok.
+func PridejAnimovanyBlokAnim(cesta_k_obrazku string, vyrezy ...Vyrez) *AnimovanyBlok {
+	// TODO this function should be mainly used in next school year
 	sub_block, err := loadImageToBlock(cesta_k_obrazku)
 	if err != nil {
 		log.Error("Nepodařilo se načíst obrázek bloku", "chyba", err)
@@ -106,20 +118,40 @@ func PridejAnimovanyBlok(cesta_k_obrazku string, rychlost_animace float64, vyrez
 	for _, vyrez := range vyrezy {
 		subImages = append(subImages, image.Rect(vyrez.X1, vyrez.Y1, vyrez.X2, vyrez.Y2))
 	}
+	block := &AnimovanyBlok{
+		Blok:           *sub_block,
+		animationSpeed: 10,
+		subImage:       subImages,
+	}
+	game_instance.blocks = append(game_instance.blocks, block)
+	return block
+}
+
+// TODO doc comment
+func PridejAnimovanyBlokVsechnySnimky(cesta_k_obrazku string) *AnimovanyBlok {
+	return PridejAnimovanyBlokAnim(cesta_k_obrazku, NactiMriezku(cesta_k_obrazku).VsechnySnimky()...)
+}
+
+// TODO doc comment
+func PridejAnimovanyBlokRada(cesta_k_obrazku string, zacatek, konec int) *AnimovanyBlok {
+	return PridejAnimovanyBlokAnim(cesta_k_obrazku, NactiMriezku(cesta_k_obrazku).Rada(zacatek, konec)...)
+}
+
+// TODO doc comment
+func PridejAnimovanyBlokSnimky(cesta_k_obrazku string, indexy ...int) *AnimovanyBlok {
+	return PridejAnimovanyBlokAnim(cesta_k_obrazku, NactiMriezku(cesta_k_obrazku).Snimky(indexy...)...)
+}
+
+func NastavRychlostAnimaceProAnimovanyBlok(animovany_blok *AnimovanyBlok, rychlost_animace float64) {
 	animationSpeed := int(1 / rychlost_animace)
 	if animationSpeed <= 0 {
 		animationSpeed = 1
 	}
-	block := &AnimovanyBlok{
-		Blok:           *sub_block,
-		animationSpeed: animationSpeed,
-		subImage:       subImages,
-	}
-	game_instance.blocks = append(game_instance.blocks, block)
-	return &block.Blok
+	animovany_blok.animationSpeed = animationSpeed
 }
 
 func PrijdejHratelnouPostavu(cesta_k_obrazku string, rychlost_animace float64, akce_pohybu map[ebiten.Key]Akce) *Postava {
+	// TODO misspell delete for next school year
 	return PridejHratelnouPostavu(cesta_k_obrazku, rychlost_animace, akce_pohybu)
 }
 
@@ -184,6 +216,8 @@ func NastavZvetseni(blok *Blok, zvetseni float64) {
 	blok.scale.width = zvetseni
 	blok.scale.height = zvetseni
 }
+
+// TODO func NastavVelikostObrazku
 
 // NastavPozici přesune blok na zadané souřadnice na obrazovce.
 // Souřadnice x udává vzdálenost od levého okraje, y od horního okraje (v pixelech).
@@ -294,6 +328,60 @@ func ZapniKameru() {
 // VypniKameru vypne posouvání obrazovky – kamera zůstane na místě.
 func VypniKameru() {
 	game_instance.camera.active = false
+}
+
+// NactiMriezku načte mřížku snímků pro obrázek na dané cestě.
+// Volitelný parametr nazev umožňuje mít více různých mřížek pro jeden obrázek –
+// například gke.NactiMriezku("./postava.png", "stani") a gke.NactiMriezku("./postava.png", "beh").
+// Pokud soubor s nastavením ještě neexistuje, otevře se okno pro konfiguraci mřížky.
+// Po nastavení se konfigurace uloží – příště se načte automaticky.
+func NactiMriezku(cesta_k_obrazku string, nazev ...string) *Mriezka {
+	name := ""
+	if len(nazev) > 0 {
+		name = nazev[0]
+	}
+	if m, ok := nactiMriezku(cesta_k_obrazku, name); ok {
+		return m
+	}
+	m, err := openGridConfigurator(cesta_k_obrazku, name)
+	if err != nil {
+		// TODO update log
+		log.Error("Nepodařilo se načíst obrázek mřížky", "chyba", err)
+		os.Exit(1)
+	}
+	return m
+}
+
+func UpravMriezku(cesta_k_obrazku string, nazev ...string) *Mriezka {
+	name := ""
+	if len(nazev) > 0 {
+		name = nazev[0]
+	}
+	m, err := openGridConfigurator(cesta_k_obrazku, name)
+	if err != nil {
+		// TODO update log
+		log.Error("Nepodařilo se načíst obrázek mřížky", "chyba", err)
+		os.Exit(1)
+	}
+	return m
+}
+
+func PridejBlokyPlosinuZBloku(cesta_k_obrazku string, opakovani int, x, y float64) {
+	for i := 0; i <= opakovani; i += 1 {
+		blok := PridejBlok("./obrazky/bloky.png")
+		blok.coords.x = x + float64(i*blok.image.Bounds().Dx())
+		blok.coords.y = y
+		blok.solid = true
+	}
+}
+
+func PridejBlokyPlosinuZBlokuSVyrezem(cesta_k_obrazku string, vyrez Vyrez, opakovani int, x, y float64) {
+	for i := 0; i <= opakovani; i += 1 {
+		blok := PridejBlokSVyrezem(cesta_k_obrazku, vyrez)
+		blok.coords.x = x + float64(i)*math.Abs(float64(vyrez.X1-vyrez.X2))
+		blok.coords.y = y
+		blok.solid = true
+	}
 }
 
 // SpustHru spustí hru! Tuhle funkci zavolej jako poslední, až budeš mít vše připraveno.

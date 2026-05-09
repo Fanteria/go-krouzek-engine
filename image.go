@@ -15,7 +15,18 @@ import (
 
 // Loaded images are in map so loadImage can be used multiple time without large memory overhead.
 var images map[string]*ebiten.Image
+
+// TODO doc comment
 var assets *embed.FS = nil
+
+// TODO doc comment
+func readFile(path string) ([]byte, error) {
+	if assets == nil {
+		return os.ReadFile(path)
+	} else {
+		return assets.ReadFile(strings.TrimPrefix(path, "./"))
+	}
+}
 
 // loadImage loads an image from the given file path and returns it as an ebiten image.
 // Supports PNG and JPEG formats.
@@ -24,13 +35,7 @@ func loadImage(path string) (*ebiten.Image, error) {
 	if img != nil {
 		return img, nil
 	}
-	var image_buffer []byte
-	var err error
-	if assets == nil {
-		image_buffer, err = os.ReadFile(path)
-	} else {
-		image_buffer, err = assets.ReadFile(strings.TrimPrefix(path, "./"))
-	}
+	image_buffer, err := readFile(path)
 	if err != nil {
 		return nil, err
 	}
