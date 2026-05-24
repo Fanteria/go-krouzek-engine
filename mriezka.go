@@ -16,6 +16,8 @@ import (
 	"golang.org/x/image/font/basicfont"
 )
 
+// TODO rename Mriezka to Mrizka
+
 // Mriezka popisuje rovnoměrnou mřížku snímků ve spritesheetu.
 type Mriezka struct {
 	name        string
@@ -84,6 +86,11 @@ func (m *Mriezka) VsechnySnimky() []Vyrez {
 		indexy[i] = i
 	}
 	return m.Snimky(indexy...)
+}
+
+// Vrátí jeden snímek z mřížky.
+func (m *Mriezka) Snimek(index int) Vyrez {
+	return m.Snimky(index)[0]
 }
 
 // --- config UI ---
