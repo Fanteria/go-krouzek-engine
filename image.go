@@ -14,7 +14,7 @@ import (
 )
 
 // Loaded images are in map so loadImage can be used multiple time without large memory overhead.
-var images map[string]*ebiten.Image
+var images = make(map[string]*ebiten.Image)
 
 // TODO doc comment
 var assets *embed.FS = nil
@@ -43,7 +43,9 @@ func loadImage(path string) (*ebiten.Image, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ebiten.NewImageFromImage(image), nil
+	img = ebiten.NewImageFromImage(image)
+	images[path] = img
+	return img, nil
 }
 
 // loadImageToBlock loads an image from the given file path and wraps it in a Blok
