@@ -285,7 +285,7 @@ func runGridConfig(m *Mriezka, rawImg image.Image) {
 }
 
 func nactiMriezku(cesta, name string) (*Mriezka, bool) {
-	data, err := os.ReadFile(sidecarPath(cesta, name))
+	data, err := readFile(sidecarPath(cesta, name))
 	if err != nil {
 		return nil, false
 	}
