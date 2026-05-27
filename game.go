@@ -57,7 +57,7 @@ func (g *game) Draw(screen *ebiten.Image) {
 			options.GeoM.Translate(w, 0)
 		}
 		options.GeoM.Translate(b.coords.x-g.camera.offsetX, b.coords.y-g.camera.offsetY)
-		picture := ebiten.NewImageFromImage(b.image.SubImage(sub_image))
+		picture := b.image.SubImage(sub_image).(*ebiten.Image) 
 		screen.DrawImage(picture, options)
 	}
 
