@@ -46,10 +46,11 @@ func (g *game) Draw(screen *ebiten.Image) {
 	// rendering background
 	g.background.draw(screen, g.camera.offsetX, g.camera.offsetY)
 	// rendering blocks
+	var options ebiten.DrawImageOptions
 	for _, block := range g.blocks {
 		b := block.getBlock()
 		sub_image := block.getSubImage(g.animationIndex)
-		options := &ebiten.DrawImageOptions{}
+		options = ebiten.DrawImageOptions{}
 		options.GeoM.Scale(b.scale.width, b.scale.height)
 		if block.isMirrored() {
 			w := float64(sub_image.Dx()) * b.scale.width
@@ -57,8 +58,8 @@ func (g *game) Draw(screen *ebiten.Image) {
 			options.GeoM.Translate(w, 0)
 		}
 		options.GeoM.Translate(b.coords.x-g.camera.offsetX, b.coords.y-g.camera.offsetY)
-		picture := b.image.SubImage(sub_image).(*ebiten.Image) 
-		screen.DrawImage(picture, options)
+		picture := b.image.SubImage(sub_image).(*ebiten.Image)
+		screen.DrawImage(picture, &options)
 	}
 
 	// Draw coordinates grid

@@ -111,6 +111,13 @@ func firstAnimationFrame(b *Postava) (image.Rectangle, bool) {
 // TODO default should be zero in next year
 var gravity float64 = 0.3
 
+var opposingActions = [2][2]Akce{
+	{AkceJdeVLevo, AkceJdeVPravo},
+	{AkceJdeNahoru, AkceJdeDolu},
+}
+
+var pressedKeys []ebiten.Key
+
 type Postava struct {
 	Blok
 	actionSubImages [akcePocet]PostavaAnimation
@@ -122,22 +129,46 @@ type Postava struct {
 	onGround        bool
 }
 
-func (b *Postava) getSubImageAnimation() *PostavaAnimation {
-	actions := b.actualActions
-	if !b.onGround {
-		actions = append(actions, AkceSkace)
+func (b *Postava) getActionAnimation(actions ...Akce) *PostavaAnimation {
+	for _, action := range actions {
+		animation := &b.actionSubImages[action]
+		if len(animation.rectangles) != 0 {
+			return animation
+		}
 	}
+	if len(b.actionSubImages[AkceStoji].rectangles) != 0 {
+		return &b.actionSubImages[AkceStoji]
+	}
+	for i := range b.actionSubImages {
+		if len(b.actionSubImages[i].rectangles) != 0 {
+			return &b.actionSubImages[i]
+		}
+	}
+	log.Error("Není zadáná ani jedna animace postavy")
+	return nil
+}
+
+func (b *Postava) getSubImageAnimation() *PostavaAnimation {
+	// Use a stack-allocated buffer to avoid heap allocation.
+	var buf [akcePocet]Akce
+	n := copy(buf[:], b.actualActions)
+	if !b.onGround && n < akcePocet {
+		buf[n] = AkceSkace
+		n++
+	}
+	actions := buf[:n]
 
 	// Cancel opposing direction pairs.
-	opposing := [][2]Akce{
-		{AkceJdeVLevo, AkceJdeVPravo},
-		{AkceJdeNahoru, AkceJdeDolu},
-	}
-	for _, pair := range opposing {
+	for _, pair := range opposingActions {
 		if slices.Contains(actions, pair[0]) && slices.Contains(actions, pair[1]) {
-			actions = slices.DeleteFunc(actions, func(a Akce) bool {
-				return a == pair[0] || a == pair[1]
-			})
+			m := 0
+			for _, a := range actions {
+				if a != pair[0] && a != pair[1] {
+					actions[m] = a
+					m++
+				}
+			}
+			actions = actions[:m]
 		}
 	}
 
@@ -145,43 +176,24 @@ func (b *Postava) getSubImageAnimation() *PostavaAnimation {
 	slices.Sort(actions)
 	actions = slices.Compact(actions)
 
-	get_action := func(actions ...Akce) *PostavaAnimation {
-		for _, action := range actions {
-			animation := &b.actionSubImages[action]
-			if len(animation.rectangles) != 0 {
-				return animation
-			}
-		}
-		if len(b.actionSubImages[AkceStoji].rectangles) != 0 {
-			return &b.actionSubImages[AkceStoji]
-		}
-		for _, animation_images := range b.actionSubImages {
-			if len(animation_images.rectangles) != 0 {
-				return &animation_images
-			}
-		}
-		log.Error("Není zadáná ani jedna animace postavy")
-		return nil
-	}
-
 	switch {
 	case len(actions) == 0:
-		return get_action()
+		return b.getActionAnimation()
 	case len(actions) == 1:
-		return get_action(actions[0])
-	case slices.Equal(actions, []Akce{AkceJdeVLevo, AkceSkace}):
-		return get_action(AkceSkaceVLevo, AkceSkace, AkceJdeVLevo)
-	case slices.Equal(actions, []Akce{AkceJdeVPravo, AkceSkace}):
-		return get_action(AkceSkaceVPravo, AkceSkace, AkceJdeVPravo)
-	case slices.Equal(actions, []Akce{AkceSkaceVLevo, AkceSkaceVPravo}):
-		return get_action(AkceSkace)
-	case slices.Equal(actions, []Akce{AkceJdeVLevo, AkceSkaceVPravo}):
-		return get_action(AkceSkace)
-	case slices.Equal(actions, []Akce{AkceJdeVPravo, AkceSkaceVLevo}):
-		return get_action(AkceSkace)
+		return b.getActionAnimation(actions[0])
+	case len(actions) == 2 && actions[0] == AkceJdeVLevo && actions[1] == AkceSkace:
+		return b.getActionAnimation(AkceSkaceVLevo, AkceSkace, AkceJdeVLevo)
+	case len(actions) == 2 && actions[0] == AkceJdeVPravo && actions[1] == AkceSkace:
+		return b.getActionAnimation(AkceSkaceVPravo, AkceSkace, AkceJdeVPravo)
+	case len(actions) == 2 && actions[0] == AkceSkaceVLevo && actions[1] == AkceSkaceVPravo:
+		return b.getActionAnimation(AkceSkace)
+	case len(actions) == 2 && actions[0] == AkceJdeVLevo && actions[1] == AkceSkaceVPravo:
+		return b.getActionAnimation(AkceSkace)
+	case len(actions) == 2 && actions[0] == AkceJdeVPravo && actions[1] == AkceSkaceVLevo:
+		return b.getActionAnimation(AkceSkace)
 	default:
 		slices.Reverse(actions)
-		return get_action(actions...)
+		return b.getActionAnimation(actions...)
 	}
 }
 
