@@ -12,14 +12,18 @@ import (
 )
 
 type game struct {
-	outsideWidth   int
-	outsideHeight  int
-	animationIndex int
-	background     *background
-	blocks         []drawable
-	movables       []movable
-	camera         camera
-	gridSpacing    float64
+	outsideWidth        int
+	outsideHeight       int
+	animationIndex      int
+	background          *background
+	blocks              []drawable
+	movables            []movable
+	camera              camera
+	gridSpacing         float64
+	endScreen           *KonecovyObrazovka
+	updateCallback      func()
+	prevMouseLeftPressed bool
+	snapshot            []blockSnapshot
 }
 
 // Global instance of the game
@@ -33,11 +37,27 @@ var game_instance game = game{
 }
 
 func (g *game) Update() error {
+	mousePressed := ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
+	defer func() { g.prevMouseLeftPressed = mousePressed }()
+
+	if g.endScreen != nil {
+		if mousePressed && !g.prevMouseLeftPressed {
+			x, y := ebiten.CursorPosition()
+			if action := g.endScreen.checkClick(x, y, g.outsideWidth, g.outsideHeight); action != nil {
+				action()
+			}
+		}
+		return nil
+	}
+
 	g.animationIndex += 1
 	for _, movable := range g.movables {
 		movable.move(g.blocks)
 	}
 	g.camera.actualize(g.outsideWidth, g.outsideHeight)
+	if g.updateCallback != nil {
+		g.updateCallback()
+	}
 	log.Debug("Camera actualized", "camera", g.camera)
 	return nil
 }
@@ -82,6 +102,10 @@ func (g *game) Draw(screen *ebiten.Image) {
 			text.Draw(screen, label, basicfont.Face7x13, 2, int(sy)+12, color.White)
 			vector.StrokeLine(screen, 0, float32(sy), float32(screen.Bounds().Dx()), float32(sy), 1, color.Gray{Y: 100}, false)
 		}
+	}
+
+	if g.endScreen != nil {
+		g.endScreen.draw(screen)
 	}
 }
 

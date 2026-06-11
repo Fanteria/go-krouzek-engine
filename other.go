@@ -199,7 +199,7 @@ func (b *Postava) getSubImageAnimation() *PostavaAnimation {
 
 func (b *Postava) getSubImage(index int) image.Rectangle {
 	subimage := b.getSubImageAnimation()
-	if len(subimage.rectangles) == 0 {
+	if subimage == nil || len(subimage.rectangles) == 0 {
 		if sub, found := firstAnimationFrame(b); found {
 			return sub
 		}
@@ -210,7 +210,7 @@ func (b *Postava) getSubImage(index int) image.Rectangle {
 
 func (b *Postava) isMirrored() bool {
 	subimage := b.getSubImageAnimation()
-	return subimage.mirror
+	return subimage != nil && subimage.mirror
 }
 
 func (b *Postava) move(self drawable, blocks []drawable) {

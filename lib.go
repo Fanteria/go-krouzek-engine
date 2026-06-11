@@ -384,8 +384,45 @@ func PridejBlokyPlosinuZBlokuSVyrezem(cesta_k_obrazku string, vyrez Vyrez, opako
 	}
 }
 
+// NastavKonecovouObrazovku vytvoří novou závěrečnou obrazovku s řádky textu.
+// Můžeš zadat jeden nebo více řádků textu, například: "Gratulujeme!", "Dohrál jsi hru!".
+// Vrátí ukazatel na obrazovku, ke které pak přidáš tlačítka pomocí PridejTlacitko.
+func NastavKonecovouObrazovku(radky_textu ...string) *KonecovyObrazovka {
+	return &KonecovyObrazovka{textLines: radky_textu}
+}
+
+// PridejTlacitko přidá tlačítko na závěrečnou obrazovku.
+// Zadej obrazovku, popis tlačítka (text na tlačítku) a funkci, která se spustí po kliknutí.
+func PridejTlacitko(obrazovka *KonecovyObrazovka, popis string, akce func()) {
+	obrazovka.buttons = append(obrazovka.buttons, tlacitko{label: popis, action: akce})
+}
+
+// ZobrazKonecovouObrazovku zobrazí závěrečnou obrazovku přes hru a pozastaví herní smyčku.
+func ZobrazKonecovouObrazovku(obrazovka *KonecovyObrazovka) {
+	game_instance.endScreen = obrazovka
+}
+
+// SkryjKonecovouObrazovku skryje závěrečnou obrazovku a obnoví běh hry.
+func SkryjKonecovouObrazovku() {
+	game_instance.endScreen = nil
+}
+
+// ResetujHru obnoví hru do stavu před jejím spuštěním.
+// Všechny postavy a bloky se vrátí na svá původní místa.
+func ResetujHru() {
+	game_instance.restoreSnapshot()
+	game_instance.endScreen = nil
+}
+
+// NastavAktualizaci nastaví funkci, která se zavolá každý snímek hry.
+// Použij ji pro vlastní herní logiku – například kontrolu, zda postava dosáhla cíle.
+func NastavAktualizaci(callback func()) {
+	game_instance.updateCallback = callback
+}
+
 // SpustHru spustí hru! Tuhle funkci zavolej jako poslední, až budeš mít vše připraveno.
 // Po jejím zavolání se otevře okno hry a hra začne běžet.
 func SpustHru() {
+	game_instance.saveSnapshot()
 	ebiten.RunGame(&game_instance)
 }
