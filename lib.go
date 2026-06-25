@@ -330,6 +330,14 @@ func VypniKameru() {
 	game_instance.camera.active = false
 }
 
+func KameraOffsetX() float64 {
+	return game_instance.camera.offsetX
+}
+
+func KameraOffsetY() float64 {
+	return game_instance.camera.offsetY
+}
+
 // NactiMriezku načte mřížku snímků pro obrázek na dané cestě.
 // Volitelný parametr nazev umožňuje mít více různých mřížek pro jeden obrázek –
 // například gke.NactiMriezku("./postava.png", "stani") a gke.NactiMriezku("./postava.png", "beh").
